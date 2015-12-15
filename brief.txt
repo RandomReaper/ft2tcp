@@ -1,0 +1,10 @@
+ftdi FT245 synchronous to tcp server sofware
+
+TODO open/configure/transfer data from/to FT2232H, in FT245 synchronous
+mode
+
+Cross-compiled for windows using mxe.cc
+
+At this it detects our breakout on :
+* Linux - ubuntu 14.04.3 LTS AMD64
+* Windows 7 - 64 bits
