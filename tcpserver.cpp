@@ -1,5 +1,5 @@
 #include "tcpserver.h"
-#include <QTimer>
+#include <QDebug>
 
 TcpServer::TcpServer(QObject *parent) :
     QObject(parent)
@@ -19,12 +19,9 @@ TcpServer::TcpServer(QObject *parent) :
         qDebug() << "Server started!";
     }
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(timer_sim_data()));
-    timer->start(1000);
 }
 
-void TcpServer::write(const QByteArray &data)
+void TcpServer::tx(const QByteArray &data)
 {
     foreach(QTcpSocket *s, clients)
     {
@@ -32,18 +29,16 @@ void TcpServer::write(const QByteArray &data)
     }
 }
 
-void TcpServer::timer_sim_data()
-{
-    QString msg;
-    msg.sprintf("Hello client count = %d\n", clients.size());
-    write(msg.toLatin1());
-}
-
 void TcpServer::disconnected()
 {
-    // client has disconnected, so remove from list
-    QTcpSocket* pClient = static_cast<QTcpSocket*>(QObject::sender());
-    clients.removeOne(pClient);
+    QTcpSocket* client = static_cast<QTcpSocket*>(QObject::sender());
+    clients.removeOne(client);
+}
+
+void TcpServer::rxReady()
+{
+    QTcpSocket* client = static_cast<QTcpSocket*>(QObject::sender());
+    emit rx(client->readAll());
 }
 
 void TcpServer::newConnection()
@@ -52,6 +47,7 @@ void TcpServer::newConnection()
     QTcpSocket *socket = server->nextPendingConnection();
     clients.push_back(socket);
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(socket, SIGNAL(readyRead()), this, SLOT(rxReady()));
 
     QString msg;
     msg.sprintf("Hello client count = %d\n", clients.size());

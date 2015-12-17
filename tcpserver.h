@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QTcpServer>
-#include <QDebug>
 
 class TcpServer : public QObject
 {
@@ -13,14 +12,15 @@ public:
     explicit TcpServer(QObject *parent = 0);
 
 signals:
+    void rx(const QByteArray &data);
 
 public slots:
-    void disconnected();
-    void write(const QByteArray &data);
+    void tx(const QByteArray &data);
 
 private slots:
+    void disconnected();
     void newConnection();
-    void timer_sim_data();
+    void rxReady();
 
 private:
     QTcpServer *server;
