@@ -45,12 +45,18 @@ void Ft245::close(void)
 
 Ft245::Ft245(QObject *parent) : QObject(parent)
 {
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(timer_sim_data()));
-    timer->start(1000);
-
     open();
+    uint8_t buffer[256];
+    memset(buffer, 0x00, sizeof(buffer));
+    qDebug() << "before read";
+    int ret = ftdi_read_data(ftdi, buffer, sizeof(buffer));
+    qDebug() << "after read, ret = " << ret;
+    for (size_t i = 0 ; i < sizeof(buffer) ; i++)
+    {
+        printf("i%03d:0x%02x\n", (int)i, buffer[i]);
+    }
+
+    emit rx(QByteArray((char *)buffer, sizeof(buffer)));
 }
 
 Ft245::~Ft245()
@@ -63,24 +69,6 @@ void Ft245::fatal(const char *msg, const char *file, int n)
     qDebug() << msg << "in file" << file << ", line : " << n;
 
     emit fatal();
-}
-
-void Ft245::timer_sim_data()
-{
-    QString a;
-    unsigned int chipid;
-    int ret;
-
-    ret = ftdi_read_chipid(ftdi, &chipid);
-    if (ret)
-    {
-        fatal("wahou", __FILE__, __LINE__ );
-    }
-
-    ret = ftdi_set_bitmode(ftdi, 0, BITMODE_SYNCFF);
-
-    a.sprintf("ftdi_read_chipid: 0x%08x\n", chipid);
-    emit rx(a.toLatin1());
 }
 
 void Ft245::tx(const QByteArray &data)

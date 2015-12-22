@@ -20,9 +20,6 @@ signals:
 public slots:
     void tx(const QByteArray &data);
 
-private slots:
-    void timer_sim_data();
-
 private:
     void fatal(const char *msg, const char *file, int n);
     void open(void);
