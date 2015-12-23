@@ -1,17 +1,6 @@
 #include "ft245.h"
-#include <QTimer>
-
-static int read_callback(uint8_t *buffer, int length, FTDIProgressInfo *progress, void *userdata)
-{
-    (void)progress;
-    Ft245 *ft245 = (Ft245 *)userdata;
-
-    printf("%s:%d\n", __FUNCTION__, length);
-
-    ft245->rx_callback(QByteArray((char *)buffer, length));
-
-    return 1;
-}
+#include "ft245_rx_thread.h"
+#include <QDebug>
 
 void Ft245::rx_callback(const QByteArray &data)
 {
@@ -39,19 +28,21 @@ void Ft245::open(void)
         return close();
     }
 
+    // Fixme, seems already in ftdi_readstream
     if (ftdi_set_bitmode(ftdi, 0, BITMODE_SYNCFF))
     {
         fatal("wahou", __FILE__, __LINE__ );
         return close();
     }
 
-    if (ftdi_readstream(ftdi, read_callback,  this, 1, 1))
-    {
-        fatal("wahou", __FILE__, __LINE__ );
-        return close();
-    }
-
-    emit tx("waou");
+    ft245_rx = new Ft245RxThread;
+    ft245_rx->moveToThread(&rx_thread);
+    connect(&rx_thread, &QThread::finished, ft245_rx, &QObject::deleteLater);
+    connect(this, &Ft245::rx_thread_start, ft245_rx, &Ft245RxThread::doWork);
+    connect(this, &Ft245::rx_thread_stop, ft245_rx, &Ft245RxThread::stop);
+    connect(ft245_rx, &Ft245RxThread::rx, this, &Ft245::rx);
+    rx_thread.start();
+    emit rx_thread_start(ftdi);
 
     return;
 }
@@ -62,6 +53,12 @@ void Ft245::close(void)
     {
         return;
     }
+
+    emit rx_thread_stop();
+
+    rx_thread.quit();
+    rx_thread.wait();
+
     ftdi_usb_close(ftdi);
     ftdi_free(ftdi);
     ftdi = NULL;

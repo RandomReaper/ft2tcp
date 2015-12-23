@@ -23,7 +23,6 @@ TcpServer::TcpServer(QObject *parent) :
 
 void TcpServer::tx(const QByteArray &data)
 {
-    printf("tcpserver:tx:%d\n", data.length());
     foreach(QTcpSocket *s, clients)
     {
         s->write(data);

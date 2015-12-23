@@ -2,9 +2,9 @@
 #define FT245_H
 
 #include <QObject>
-#include <QDebug>
-#include <libftdi1/ftdi.h>
 #include <QThread>
+#include <libftdi1/ftdi.h>
+#include "ft245_rx_thread.h"
 
 class Ft245 : public QObject
 {
@@ -17,6 +17,8 @@ public:
 signals:
     void fatal();
     void rx(const QByteArray &data);
+    void rx_thread_start(struct ftdi_context *ftdi);
+    void rx_thread_stop();
 
 public slots:
     void tx(const QByteArray &data);
@@ -27,7 +29,9 @@ private:
     void close(void);
 
     struct ftdi_context *ftdi;
-    QThread workerThread;
+    QThread rx_thread;
+    Ft245RxThread *ft245_rx;
 };
 
 #endif /* FT245_H */
+
