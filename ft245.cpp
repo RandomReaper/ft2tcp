@@ -1,6 +1,22 @@
 #include "ft245.h"
-#include <libftdi1/ftdi.h>
 #include <QTimer>
+
+static int read_callback(uint8_t *buffer, int length, FTDIProgressInfo *progress, void *userdata)
+{
+    (void)progress;
+    Ft245 *ft245 = (Ft245 *)userdata;
+
+    printf("%s:%d\n", __FUNCTION__, length);
+
+    ft245->rx_callback(QByteArray((char *)buffer, length));
+
+    return 1;
+}
+
+void Ft245::rx_callback(const QByteArray &data)
+{
+    emit rx(data);
+}
 
 void Ft245::open(void)
 {
@@ -29,6 +45,14 @@ void Ft245::open(void)
         return close();
     }
 
+    if (ftdi_readstream(ftdi, read_callback,  this, 1, 1))
+    {
+        fatal("wahou", __FILE__, __LINE__ );
+        return close();
+    }
+
+    emit tx("waou");
+
     return;
 }
 
@@ -46,17 +70,6 @@ void Ft245::close(void)
 Ft245::Ft245(QObject *parent) : QObject(parent)
 {
     open();
-    uint8_t buffer[256];
-    memset(buffer, 0x00, sizeof(buffer));
-    qDebug() << "before read";
-    int ret = ftdi_read_data(ftdi, buffer, sizeof(buffer));
-    qDebug() << "after read, ret = " << ret;
-    for (size_t i = 0 ; i < sizeof(buffer) ; i++)
-    {
-        printf("i%03d:0x%02x\n", (int)i, buffer[i]);
-    }
-
-    emit rx(QByteArray((char *)buffer, sizeof(buffer)));
 }
 
 Ft245::~Ft245()

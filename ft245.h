@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
-#include <ftdi.h>
+#include <libftdi1/ftdi.h>
 #include <QThread>
 
 class Ft245 : public QObject
@@ -12,6 +12,7 @@ class Ft245 : public QObject
 public:
     Ft245(QObject *parent = 0);
     virtual ~Ft245();
+    void rx_callback(const QByteArray &data);
 
 signals:
     void fatal();

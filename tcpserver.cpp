@@ -23,6 +23,7 @@ TcpServer::TcpServer(QObject *parent) :
 
 void TcpServer::tx(const QByteArray &data)
 {
+    printf("tcpserver:tx:%d\n", data.length());
     foreach(QTcpSocket *s, clients)
     {
         s->write(data);
@@ -51,6 +52,7 @@ void TcpServer::newConnection()
 
     QString msg;
     msg.sprintf("Hello client count = %d\n", clients.size());
+    qDebug() << "clients :" << clients.size();
 
     socket->write(msg.toLatin1());
 }
