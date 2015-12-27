@@ -4,7 +4,7 @@
 
 void Ft245::rx_callback(const QByteArray &data)
 {
-    emit rx(data);
+	emit rx(data);
 }
 
 void Ft245::open(void)
@@ -83,5 +83,6 @@ void Ft245::fatal(const char *msg, const char *file, int n)
 
 void Ft245::tx(const QByteArray &data)
 {
+    ftdi_write_data(ftdi, (const unsigned char*)data.data(), data.length());
    qDebug() << QString(data);
 }

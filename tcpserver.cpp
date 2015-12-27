@@ -48,10 +48,4 @@ void TcpServer::newConnection()
     clients.push_back(socket);
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(rxReady()));
-
-    QString msg;
-    msg.sprintf("Hello client count = %d\n", clients.size());
-    qDebug() << "clients :" << clients.size();
-
-    socket->write(msg.toLatin1());
 }
