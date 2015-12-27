@@ -9,80 +9,79 @@ void Ft245::rx_callback(const QByteArray &data)
 
 void Ft245::open(void)
 {
-    ftdi = ftdi_new();
+	ftdi = ftdi_new();
 
-    if (!ftdi)
-    {
-        return;
-    }
+	if (!ftdi)
+	{
+		return;
+	}
 
-    if (ftdi_set_interface(ftdi, INTERFACE_A))
-    {
-        fatal("wahou", __FILE__, __LINE__ );
-        return close();
-    }
+	if (ftdi_set_interface(ftdi, INTERFACE_A))
+	{
+		fatal("wahou", __FILE__, __LINE__ );
+		return close();
+	}
 
-    if (ftdi_usb_open(ftdi, 0x0403, 0x6010) < 0)
-    {
-        fatal("wahou", __FILE__, __LINE__ );
-        return close();
-    }
+	if (ftdi_usb_open(ftdi, 0x0403, 0x6010) < 0)
+	{
+		fatal("wahou", __FILE__, __LINE__ );
+		return close();
+	}
 
-    // Fixme, seems already in ftdi_readstream
-    if (ftdi_set_bitmode(ftdi, 0, BITMODE_SYNCFF))
-    {
-        fatal("wahou", __FILE__, __LINE__ );
-        return close();
-    }
+	// Fixme, seems already in ftdi_readstream
+	if (ftdi_set_bitmode(ftdi, 0, BITMODE_SYNCFF))
+	{
+		fatal("wahou", __FILE__, __LINE__ );
+		return close();
+	}
 
-    ft245_rx = new Ft245RxThread;
-    ft245_rx->moveToThread(&rx_thread);
-    connect(&rx_thread, &QThread::finished, ft245_rx, &QObject::deleteLater);
-    connect(this, &Ft245::rx_thread_start, ft245_rx, &Ft245RxThread::doWork);
-    connect(this, &Ft245::rx_thread_stop, ft245_rx, &Ft245RxThread::stop);
-    connect(ft245_rx, &Ft245RxThread::rx, this, &Ft245::rx);
-    rx_thread.start();
-    emit rx_thread_start(ftdi);
+	ft245_rx = new Ft245RxThread;
+	ft245_rx->moveToThread(&rx_thread);
+	connect(&rx_thread, &QThread::finished, ft245_rx, &QObject::deleteLater);
+	connect(this, &Ft245::rx_thread_start, ft245_rx, &Ft245RxThread::doWork);
+	connect(this, &Ft245::rx_thread_stop, ft245_rx, &Ft245RxThread::stop);
+	connect(ft245_rx, &Ft245RxThread::rx, this, &Ft245::rx);
+	rx_thread.start();
+	emit rx_thread_start(ftdi);
 
-    return;
+	return;
 }
 
 void Ft245::close(void)
 {
-    if (!ftdi)
-    {
-        return;
-    }
+	if (!ftdi)
+	{
+		return;
+	}
 
-    emit rx_thread_stop();
+	emit rx_thread_stop();
 
-    rx_thread.quit();
-    rx_thread.wait();
+	rx_thread.quit();
+	rx_thread.wait();
 
-    ftdi_usb_close(ftdi);
-    ftdi_free(ftdi);
-    ftdi = NULL;
+	ftdi_usb_close(ftdi);
+	ftdi_free(ftdi);
+	ftdi = NULL;
 }
 
 Ft245::Ft245(QObject *parent) : QObject(parent)
 {
-    open();
+	open();
 }
 
 Ft245::~Ft245()
 {
-    close();
+	close();
 }
 
 void Ft245::fatal(const char *msg, const char *file, int n)
 {
-    qDebug() << msg << "in file" << file << ", line : " << n;
+	qDebug() << msg << "in file" << file << ", line : " << n;
 
-    emit fatal();
+	emit fatal();
 }
 
 void Ft245::tx(const QByteArray &data)
 {
-    ftdi_write_data(ftdi, (const unsigned char*)data.data(), data.length());
-   qDebug() << QString(data);
+	ftdi_write_data(ftdi, (const unsigned char*)data.data(), data.length());
 }

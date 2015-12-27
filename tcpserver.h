@@ -7,24 +7,24 @@
 
 class TcpServer : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit TcpServer(QObject *parent = 0);
+	explicit TcpServer(QObject *parent = 0);
 
 signals:
-    void rx(const QByteArray &data);
+	void rx(const QByteArray &data);
 
 public slots:
-    void tx(const QByteArray &data);
+	void tx(const QByteArray &data);
 
 private slots:
-    void disconnected();
-    void newConnection();
-    void rxReady();
+	void disconnected();
+	void newConnection();
+	void rxReady();
 
 private:
-    QTcpServer *server;
-    QList<QTcpSocket*> clients;
+	QTcpServer *server;
+	QList<QTcpSocket*> clients;
 };
 
 #endif /* TCPSERVER_H */
