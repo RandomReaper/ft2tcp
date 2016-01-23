@@ -14,6 +14,7 @@ public slots:
 
 signals:
 	void rx(const QByteArray &data);
+	void stopped();
 
 public:
 	bool _stop;

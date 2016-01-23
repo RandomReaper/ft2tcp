@@ -22,6 +22,7 @@ signals:
 
 public slots:
 	void tx(const QByteArray &data);
+	void rx_thread_stopped();
 
 private:
 	void fatal(const char *msg, const char *file, int n);

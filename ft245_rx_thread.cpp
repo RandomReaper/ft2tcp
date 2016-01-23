@@ -1,5 +1,5 @@
 #include "ft245_rx_thread.h"
-
+#include <stdio.h>
 static int read_callback(uint8_t *buffer, int length, FTDIProgressInfo *progress, void *userdata)
 {
 	(void)progress;
@@ -18,7 +18,9 @@ static int read_callback(uint8_t *buffer, int length, FTDIProgressInfo *progress
 void Ft245RxThread::doWork(struct ftdi_context *ftdi)
 {
 	_stop = false;
-	ftdi_readstream(ftdi, read_callback, this, 256, 8);
+	ftdi_readstream(ftdi, read_callback, this, 8, 256);
+	_stop = true;
+	emit stopped();
 }
 
 void Ft245RxThread::stop(void)
