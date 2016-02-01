@@ -14,10 +14,16 @@ void Ft245::rx_thread_stopped()
 
 void Ft245::open(void)
 {
+    struct ftdi_version_info info = ftdi_get_library_version();
+
+    qDebug() << "ftdi_get_library_version" << info.major << "." << info.minor << "." << info.micro;
+
 	ftdi = ftdi_new();
 
 	if (!ftdi)
 	{
+        fatal("!ftdi", __FILE__, __LINE__ );
+
 		return;
 	}
 
