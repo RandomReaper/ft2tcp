@@ -10,7 +10,6 @@ Q_OBJECT
 
 public slots:
 	void doWork(struct ftdi_context *ftdi);
-	void stop(void);
 
 signals:
 	void rx(const QByteArray &data);
@@ -18,6 +17,13 @@ signals:
 
 public:
 	bool _stop;
+    bool _pause;
+    void stop(void);
+    void tx(const QByteArray &data);
+
+private:
+    struct ftdi_context *ftdi;
+    bool _paused;
 };
 
 #endif /* FT245_RX_THREAD_H */

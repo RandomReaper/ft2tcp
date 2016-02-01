@@ -62,7 +62,7 @@ void Ft245::open(void)
 	rx_thread.start();
 	emit rx_thread_start(ftdi);
 
-	return;
+    return;
 }
 
 void Ft245::close(void)
@@ -106,5 +106,5 @@ void Ft245::fatal(const char *msg, const char *file, int n)
 
 void Ft245::tx(const QByteArray &data)
 {
-	ftdi_write_data(ftdi, (const unsigned char*)data.data(), data.length());
+    ft245_rx->tx(data);
 }
