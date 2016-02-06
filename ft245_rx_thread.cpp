@@ -33,8 +33,8 @@ void Ft245RxThread::doWork(struct ftdi_context *_ftdi)
         {
             QThread::usleep(1);
         }
+        qDebug() << "ftdi_readstream returned" << ret;
     } while (!_stop);
-    qDebug() << "ftdi_readstream returned" << ret;
 	_stop = true;
 	emit stopped();
 }
@@ -46,11 +46,30 @@ void Ft245RxThread::stop(void)
 
 void Ft245RxThread::tx(const QByteArray &data)
 {
+    /*
+    uint8_t header[] = {0x00,0x00};
     _pause = true;
     while(!_paused)
     {
         QThread::usleep(1);
     }
+
+    ftdi_write_data(ftdi, header, sizeof(header));
     ftdi_write_data(ftdi, (const unsigned char*)data.data(), data.length());
     _pause = false;
+    */
+
+    struct ftdi_transfer_control *xfer = ftdi_write_data_submit(ftdi, (unsigned char*)data.data(), data.length());
+    if (!xfer)
+    {
+        qDebug() << "ftdi_write_data_submit failed";
+        return;
+    }
+
+    int ret = ftdi_transfer_data_done(xfer);
+    if (ret < 0)
+    {
+        qDebug() << "ftdi_transfer_data_done failed with status" << ret;
+        return;
+    }
 }

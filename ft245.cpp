@@ -46,11 +46,18 @@ void Ft245::open(void)
 	}
 
 	// Fixme, seems already in ftdi_readstream
-	if (ftdi_set_bitmode(ftdi, 0, BITMODE_SYNCFF))
+    if (ftdi_set_bitmode(ftdi, 0xff, BITMODE_SYNCFF))
 	{
 		fatal("ftdi_set_bitmode", __FILE__, __LINE__ );
 		return close();
 	}
+
+    uint8_t tx_data[] = {0x0f};
+    if (ftdi_write_data(ftdi, tx_data, sizeof(tx_data)) < 0)
+    {
+        fatal("ftdi_write_data", __FILE__, __LINE__ );
+        return close();
+    }
 
 	ft245_rx = new Ft245RxThread;
 	ft245_rx->moveToThread(&rx_thread);
@@ -79,7 +86,7 @@ void Ft245::close(void)
 
 	if (ftdi_set_bitmode(ftdi,  0xff, BITMODE_RESET) < 0)
 	{
-		fatal("ftdi_set_bitmode", __FILE__, __LINE__ );
+        qDebug() << "ftdi_set_bitmode" << __FILE__ << ":" << __LINE__ ;
 	}
 
 	ftdi_usb_close(ftdi);
