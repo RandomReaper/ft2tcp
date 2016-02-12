@@ -45,6 +45,12 @@ void Ft245::open(void)
 		return close();
 	}
 
+    if (ftdi_set_latency_timer(ftdi, 3) < 0)
+    {
+        fatal("ftdi_set_latency_timer", __FILE__, __LINE__ );
+        return close();
+    }
+#if 0
 	// Fixme, seems already in ftdi_readstream
     if (ftdi_set_bitmode(ftdi, 0xff, BITMODE_SYNCFF))
 	{
@@ -58,7 +64,7 @@ void Ft245::open(void)
         fatal("ftdi_write_data", __FILE__, __LINE__ );
         return close();
     }
-
+#endif
 	ft245_rx = new Ft245RxThread;
 	ft245_rx->moveToThread(&rx_thread);
 	connect(&rx_thread, &QThread::finished, ft245_rx, &QObject::deleteLater);

@@ -8,7 +8,10 @@ static int read_callback(uint8_t *buffer, int length, FTDIProgressInfo *progress
 	(void)progress;
 	Ft245RxThread *self = (Ft245RxThread *)userdata;
 
-	emit self->rx(QByteArray((char *)buffer, length));
+    if (length)
+    {
+        emit self->rx(QByteArray((char *)buffer, length));
+    }
 
     if (self->_stop || self->_pause)
 	{
@@ -34,6 +37,7 @@ void Ft245RxThread::doWork(struct ftdi_context *_ftdi)
             QThread::usleep(1);
         }
         qDebug() << "ftdi_readstream returned" << ret;
+		exit(1);
     } while (!_stop);
 	_stop = true;
 	emit stopped();
