@@ -45,7 +45,7 @@ void Ft245::open(void)
 		return close();
 	}
 
-    if (ftdi_set_latency_timer(ftdi, 3) < 0)
+    if (ftdi_set_latency_timer(ftdi, 2) < 0)
     {
         fatal("ftdi_set_latency_timer", __FILE__, __LINE__ );
         return close();
