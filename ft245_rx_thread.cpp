@@ -1,19 +1,20 @@
 #include "ft245_rx_thread.h"
+#include "ft245_duplex.h"
 #include <stdio.h>
 #include <QDebug>
 #include <QThread>
+#include <QCoreApplication>
 
-static int read_callback(uint8_t *buffer, int length, FTDIProgressInfo *progress, void *userdata)
+static int read_callback(uint8_t *buffer, int length, void *userdata)
 {
-	(void)progress;
 	Ft245RxThread *self = (Ft245RxThread *)userdata;
 
-    if (length)
-    {
-        emit self->rx(QByteArray((char *)buffer, length));
-    }
+	if (length)
+	{
+		emit self->rx(QByteArray((char *)buffer, length));
+	}
 
-    if (self->_stop || self->_pause)
+	if (self->_stop)
 	{
 		return 1;
 	}
@@ -23,57 +24,50 @@ static int read_callback(uint8_t *buffer, int length, FTDIProgressInfo *progress
 
 void Ft245RxThread::doWork(struct ftdi_context *_ftdi)
 {
-    ftdi = _ftdi;
-    int ret;
+	int ret;
+
 	_stop = false;
-    do
-    {
-        _pause = false;
-        _paused = false;
-        ret = ftdi_readstream(ftdi, read_callback, this, 8, 8);
-        _paused = _pause;
-        while(_pause)
-        {
-            QThread::usleep(1);
-        }
-        qDebug() << "ftdi_readstream returned" << ret;
-		exit(1);
-    } while (!_stop);
+	duplex = ftdi_duplex_start(_ftdi, read_callback, this, 8, 8);
+
+	if (!duplex)
+	{
+		emit stopped();
+		return;
+	}
+
+	while (true)
+	{
+		ret = ftdi_duplex_poll(duplex);
+		if (ret)
+		{
+			qDebug() << "ftdi_duplex_poll returned" << ret;
+			ftdi_duplex_stop(duplex);
+			QThread::sleep (1);
+			break;
+		}
+		if (_stop)
+		{
+			break;
+		}
+		QCoreApplication::processEvents();
+	}
 	_stop = true;
+	QThread::sleep (1);
+	ftdi_duplex_stop(duplex);
 	emit stopped();
 }
 
 void Ft245RxThread::stop(void)
 {
-    _stop = true;
+	_stop = true;
 }
 
 void Ft245RxThread::tx(const QByteArray &data)
 {
-    /*
-    uint8_t header[] = {0x00,0x00};
-    _pause = true;
-    while(!_paused)
-    {
-        QThread::usleep(1);
-    }
-
-    ftdi_write_data(ftdi, header, sizeof(header));
-    ftdi_write_data(ftdi, (const unsigned char*)data.data(), data.length());
-    _pause = false;
-    */
-
-    struct ftdi_transfer_control *xfer = ftdi_write_data_submit(ftdi, (unsigned char*)data.data(), data.length());
-    if (!xfer)
-    {
-        qDebug() << "ftdi_write_data_submit failed";
-        return;
-    }
-
-    int ret = ftdi_transfer_data_done(xfer);
-    if (ret < 0)
-    {
-        qDebug() << "ftdi_transfer_data_done failed with status" << ret;
-        return;
-    }
+	int ret = ftdi_duplex_write(duplex, data.data(), data.length());
+	if (ret < 0)
+	{
+		qDebug() << "ftdi_duplex_write failed with status" << ret;
+		return;
+	}
 }

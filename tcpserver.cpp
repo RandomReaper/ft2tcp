@@ -23,15 +23,15 @@ TcpServer::TcpServer(QObject *parent) :
 
 void TcpServer::tx(const QByteArray &data)
 {
-    // qDebug() << "tx:data.length:" << data.length();
-    if (data.length() != 510)
-    {
-        //qDebug() << "tx:data.length:" << data.length();
-    }
-    if (data.length() == 0)
-    {
-        qDebug() << "tx:data.length:" << data.length();
-    }
+	// qDebug() << "tx:data.length:" << data.length();
+	if (data.length() != 510)
+	{
+		//qDebug() << "tx:data.length:" << data.length();
+	}
+	if (data.length() == 0)
+	{
+		qDebug() << "tx:data.length:" << data.length();
+	}
 
 	foreach(QTcpSocket *s, clients)
 	{

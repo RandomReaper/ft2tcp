@@ -1,6 +1,6 @@
 CONFIG += qt console
-SOURCES = tcpserver.cpp ft245.cpp ft245_rx_thread.cpp main.cpp 
-HEADERS = tcpserver.h ft245.h ft245_rx_thread.h
+SOURCES = tcpserver.cpp ft245.cpp ft245_rx_thread.cpp main.cpp ft245_duplex.c
+HEADERS = tcpserver.h ft245.h ft245_rx_thread.h ft245_duplex.h
 
 QT -= gui
 QT += core network

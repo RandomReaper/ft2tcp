@@ -17,13 +17,11 @@ signals:
 
 public:
 	bool _stop;
-    bool _pause;
-    void stop(void);
-    void tx(const QByteArray &data);
+	void stop(void);
+	void tx(const QByteArray &data);
 
 private:
-    struct ftdi_context *ftdi;
-    bool _paused;
+	struct ftdi_duplex_context *duplex;
 };
 
 #endif /* FT245_RX_THREAD_H */
