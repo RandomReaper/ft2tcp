@@ -6,7 +6,7 @@
     email                : opensource@intra2net.com
  ***************************************************************************/
 
-/* Adapted from libftdi ftdi_stream.c
+/* Adapted from libftdi ftdi_stream.c*/
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
