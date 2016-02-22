@@ -4,6 +4,10 @@
 TcpServer::TcpServer(QObject *parent) :
 	QObject(parent)
 {
+}
+
+int TcpServer::start()
+{
 	server = new QTcpServer(this);
 
 	// whenever a user connects, it will emit signal
@@ -13,12 +17,20 @@ TcpServer::TcpServer(QObject *parent) :
 	if(!server->listen(QHostAddress::Any, 9999))
 	{
 		qDebug() << "Server could not start";
+		return -1;
 	}
 	else
 	{
 		qDebug() << "Server started!";
 	}
 
+	return 0;
+}
+
+void TcpServer::quit()
+{
+	qDebug() << "server stopped";
+	server->close();
 }
 
 void TcpServer::tx(const QByteArray &data)
@@ -58,4 +70,9 @@ void TcpServer::newConnection()
 	clients.push_back(socket);
 	connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
 	connect(socket, SIGNAL(readyRead()), this, SLOT(rxReady()));
+}
+
+TcpServer::~TcpServer()
+{
+
 }

@@ -12,6 +12,7 @@ class Ft245 : public QObject
 public:
 	Ft245(QObject *parent = 0);
 	virtual ~Ft245();
+	int start();
 	void rx_callback(const QByteArray &data);
 
 signals:
@@ -26,7 +27,7 @@ public slots:
 
 private:
 	void fatal(const char *msg, const char *file, int n);
-	void open(void);
+	int open(void);
 	void close(void);
 
 	struct ftdi_context *ftdi;

@@ -9,10 +9,11 @@ void Ft245::rx_callback(const QByteArray &data)
 
 void Ft245::rx_thread_stopped()
 {
+	emit fatal();
 	emit close();
 }
 
-void Ft245::open(void)
+int Ft245::open(void)
 {
 	int type;
 	struct ftdi_version_info info = ftdi_get_library_version();
@@ -23,57 +24,65 @@ void Ft245::open(void)
 
 	if (!ftdi)
 	{
-		fatal("!ftdi", __FILE__, __LINE__ );
+		fatal("ftdi_new", __FILE__, __LINE__ );
 
-		return;
+		return -1;
 	}
 
 	if (ftdi_set_interface(ftdi, INTERFACE_A))
 	{
 		fatal("ftdi_set_interface failed", __FILE__, __LINE__ );
-		return close();
+		close();
+		return -1;
 	}
 
 	if (ftdi_usb_open(ftdi, 0x0403, 0x6010) < 0)
 	{
 		fatal("ftdi_usb_open", __FILE__, __LINE__ );
-		return close();
+		close();
+		return -1;
 	}
 
 	if (ftdi_read_eeprom(ftdi) < 0)
 	{
 		fatal("ftdi_read_eeprom", __FILE__, __LINE__ );
-		return close();
+		close();
+		return -1;
 	}
 
 	if (ftdi_eeprom_decode(ftdi, 0) < 0)
 	{
 		fatal("ftdi_eeprom_decode", __FILE__, __LINE__ );
-		return close();
+		close();
+		return -1;
 	}
 
 	if (ftdi_get_eeprom_value(ftdi, CHANNEL_A_TYPE, &type) < 0)
 	{
 		fatal("ftdi_eeprom_decode", __FILE__, __LINE__ );
-		return close();
+		close();
+		return -1;
 	}
 
 	if (type != CHANNEL_IS_FIFO)
 	{
 		fatal("type != CHANNEL_IS_FIFO, go fix your eeprom for 245FIFO mode", __FILE__, __LINE__ );
-		return close();
+		close();
+		return -1;
 	}
 
 	if(ftdi_usb_purge_rx_buffer(ftdi) < 0)
 	{
 		fatal("ftdi_usb_purge_rx_buffer", __FILE__, __LINE__ );
-		return close();
+		close();
+		return -1;
 	}
 
 	if (ftdi_set_latency_timer(ftdi, 2) < 0)
 	{
 		fatal("ftdi_set_latency_timer", __FILE__, __LINE__ );
-		return close();
+		close();
+		return -1;
 	}
 
 	ft245_rx = new Ft245RxThread;
@@ -86,7 +95,7 @@ void Ft245::open(void)
 	rx_thread.start();
 	emit rx_thread_start(ftdi);
 
-	return;
+	return 0;
 }
 
 void Ft245::close(void)
@@ -113,12 +122,12 @@ void Ft245::close(void)
 
 Ft245::Ft245(QObject *parent) : QObject(parent)
 {
-	open();
+
 }
 
-Ft245::~Ft245()
+int Ft245::start(void)
 {
-	close();
+	return open();
 }
 
 void Ft245::fatal(const char *msg, const char *file, int n)
@@ -131,4 +140,9 @@ void Ft245::fatal(const char *msg, const char *file, int n)
 void Ft245::tx(const QByteArray &data)
 {
 	ft245_rx->tx(data);
+}
+
+Ft245::~Ft245()
+{
+
 }
