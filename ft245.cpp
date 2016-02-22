@@ -14,15 +14,16 @@ void Ft245::rx_thread_stopped()
 
 void Ft245::open(void)
 {
-    struct ftdi_version_info info = ftdi_get_library_version();
+	int type;
+	struct ftdi_version_info info = ftdi_get_library_version();
 
-    qDebug() << "ftdi_get_library_version" << info.major << "." << info.minor << "." << info.micro;
+	qDebug() << "ftdi_get_library_version" << info.major << "." << info.minor << "." << info.micro;
 
 	ftdi = ftdi_new();
 
 	if (!ftdi)
 	{
-        fatal("!ftdi", __FILE__, __LINE__ );
+		fatal("!ftdi", __FILE__, __LINE__ );
 
 		return;
 	}
@@ -39,32 +40,42 @@ void Ft245::open(void)
 		return close();
 	}
 
+	if (ftdi_read_eeprom(ftdi) < 0)
+	{
+		fatal("ftdi_read_eeprom", __FILE__, __LINE__ );
+		return close();
+	}
+
+	if (ftdi_eeprom_decode(ftdi, 0) < 0)
+	{
+		fatal("ftdi_eeprom_decode", __FILE__, __LINE__ );
+		return close();
+	}
+
+	if (ftdi_get_eeprom_value(ftdi, CHANNEL_A_TYPE, &type) < 0)
+	{
+		fatal("ftdi_eeprom_decode", __FILE__, __LINE__ );
+		return close();
+	}
+
+	if (type != CHANNEL_IS_FIFO)
+	{
+		fatal("type != CHANNEL_IS_FIFO, go fix your eeprom for 245FIFO mode", __FILE__, __LINE__ );
+		return close();
+	}
+
 	if(ftdi_usb_purge_rx_buffer(ftdi) < 0)
 	{
 		fatal("ftdi_usb_purge_rx_buffer", __FILE__, __LINE__ );
 		return close();
 	}
 
-    if (ftdi_set_latency_timer(ftdi, 2) < 0)
-    {
-        fatal("ftdi_set_latency_timer", __FILE__, __LINE__ );
-        return close();
-    }
-#if 0
-	// Fixme, seems already in ftdi_readstream
-    if (ftdi_set_bitmode(ftdi, 0xff, BITMODE_SYNCFF))
+	if (ftdi_set_latency_timer(ftdi, 2) < 0)
 	{
-		fatal("ftdi_set_bitmode", __FILE__, __LINE__ );
+		fatal("ftdi_set_latency_timer", __FILE__, __LINE__ );
 		return close();
 	}
 
-    uint8_t tx_data[] = {0x0f};
-    if (ftdi_write_data(ftdi, tx_data, sizeof(tx_data)) < 0)
-    {
-        fatal("ftdi_write_data", __FILE__, __LINE__ );
-        return close();
-    }
-#endif
 	ft245_rx = new Ft245RxThread;
 	ft245_rx->moveToThread(&rx_thread);
 	connect(&rx_thread, &QThread::finished, ft245_rx, &QObject::deleteLater);
@@ -75,7 +86,7 @@ void Ft245::open(void)
 	rx_thread.start();
 	emit rx_thread_start(ftdi);
 
-    return;
+	return;
 }
 
 void Ft245::close(void)
@@ -92,7 +103,7 @@ void Ft245::close(void)
 
 	if (ftdi_set_bitmode(ftdi,  0xff, BITMODE_RESET) < 0)
 	{
-        qDebug() << "ftdi_set_bitmode" << __FILE__ << ":" << __LINE__ ;
+		qDebug() << "ftdi_set_bitmode" << __FILE__ << ":" << __LINE__ ;
 	}
 
 	ftdi_usb_close(ftdi);
@@ -119,5 +130,5 @@ void Ft245::fatal(const char *msg, const char *file, int n)
 
 void Ft245::tx(const QByteArray &data)
 {
-    ft245_rx->tx(data);
+	ft245_rx->tx(data);
 }
