@@ -1,10 +1,13 @@
-ftdi FT245 synchronous to tcp server sofware
+ftdi FT245 synchronous to TCP server sofware.
 
-TODO open/configure/transfer data from/to FT2232H, in FT245 synchronous
-mode
+requires : libftdi1-dev (version >= 1.2)
 
 Cross-compiled for windows using mxe.cc
 
-At this it detects our breakout on :
-* Linux - ubuntu 14.04.3 LTS AMD64
+All packets received from the FTDI chip is send to all connected clients.
+Connected clients can write to the FTDI chip by writing to the socket.
+
+Tested on:
+* Linux - ubuntu 14.04.3 LTS AMD64 (requires updated libftdi1-dev)
+* Linux - ubuntu 15.10 LTS AMD64 (using system libftdi1-dev)
 * Windows 7 - 64 bits

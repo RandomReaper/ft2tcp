@@ -17,6 +17,7 @@ int Ft245::open(void)
 {
 	int type;
 	struct ftdi_version_info info = ftdi_get_library_version();
+	QList<uint16_t> supported_pid = QList<uint16_t>() << 0x6010 << 0x6014;
 
 	qDebug() << "ftdi_get_library_version" << info.major << "." << info.minor << "." << info.micro;
 
@@ -36,9 +37,26 @@ int Ft245::open(void)
 		return -1;
 	}
 
-	if (ftdi_usb_open(ftdi, 0x0403, 0x6010) < 0)
+	uint16_t found_pid = 0;
+	foreach(uint16_t pid, supported_pid)
 	{
-		fatal("ftdi_usb_open", __FILE__, __LINE__ );
+		if (ftdi_usb_open(ftdi, 0x0403, pid) == 0)
+		{
+			found_pid = pid;
+			break;
+		}
+	}
+
+	if (!found_pid)
+	{
+		fatal("no devices found", __FILE__, __LINE__ );
+
+		printf("Searched for vid:pid : ");
+		foreach(uint16_t pid, supported_pid)
+		{
+			printf("0403:%04x, ", pid);
+		}
+		printf("\n");
 		close();
 		return -1;
 	}
