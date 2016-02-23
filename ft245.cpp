@@ -77,7 +77,7 @@ int Ft245::open(void)
 
 	if (ftdi_get_eeprom_value(ftdi, CHANNEL_A_TYPE, &type) < 0)
 	{
-		fatal("ftdi_eeprom_decode", __FILE__, __LINE__ );
+		fatal("ftdi_get_eeprom_value", __FILE__, __LINE__ );
 		close();
 		return -1;
 	}
