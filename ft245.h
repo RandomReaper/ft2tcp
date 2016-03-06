@@ -19,12 +19,9 @@ public:
 signals:
 	void fatal();
 	void rx(const quint8 *data, quint64 size);
-	void rx_thread_start(struct ftdi_context *ftdi);
-	void rx_thread_stop();
 
 public slots:
     void tx(const quint8 *data, quint64 size);
-	void rx_thread_stopped();
     void poll();
 
 private:

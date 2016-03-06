@@ -23,18 +23,12 @@ void Ft245::rx_callback(const quint8 *data, quint64 size)
 	emit rx(data, size);
 }
 
-void Ft245::rx_thread_stopped()
-{
-	emit fatal();
-	emit close();
-}
-
 void Ft245::poll()
 {
 	int ret = ftdi_duplex_poll(duplex);
 	if (ret)
 	{
-		qDebug() << "ftdi_duplex_poll failed : " << ret;
+		fatal("ftdi_duplex_poll", __FILE__, __LINE__ );
 	}
 }
 
@@ -144,8 +138,6 @@ void Ft245::close(void)
 	{
 		return;
 	}
-
-	emit rx_thread_stop();
 
 	if (ftdi_set_bitmode(ftdi,  0xff, BITMODE_RESET) < 0)
 	{
