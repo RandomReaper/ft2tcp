@@ -14,10 +14,10 @@ public:
 	virtual ~TcpServer();
 
 signals:
-	void rx(const QByteArray &data);
+	void rx(const quint8 *data, quint64 size);
 
 public slots:
-	void tx(const QByteArray &data);
+	void tx(const quint8 *data, quint64 size);
 	void quit();
 
 private slots:

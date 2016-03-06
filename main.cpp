@@ -10,8 +10,8 @@ int main(int argc, char *argv[])
 	TcpServer server;
 	Ft245 ft245;
 
-	QObject::connect(&ft245, SIGNAL(rx(const QByteArray &)), &server, SLOT(tx(const QByteArray &)));
-	QObject::connect(&server, SIGNAL(rx(const QByteArray &)), &ft245, SLOT(tx(const QByteArray &)));
+	QObject::connect(&ft245, SIGNAL(rx(const quint8 *, quint64)), &server, SLOT(tx(const quint8 *, quint64)));
+	QObject::connect(&server, SIGNAL(rx(const quint8 *, quint64)), &ft245, SLOT(tx(const quint8 *, quint64)));
 
 	QObject::connect(&ft245, SIGNAL(fatal()), &server, SLOT(quit()));
 	QObject::connect(&ft245, SIGNAL(fatal()), &a, SLOT(quit()));

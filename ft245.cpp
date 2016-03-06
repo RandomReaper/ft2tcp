@@ -1,16 +1,41 @@
 #include "ft245.h"
-#include "ft245_rx_thread.h"
 #include <QDebug>
 
-void Ft245::rx_callback(const QByteArray &data)
+static int read_callback(uint8_t *buffer, int length, void *userdata)
 {
-	emit rx(data);
+	Ft245 *self = (Ft245 *)userdata;
+
+	if (length)
+	{
+		emit self->rx(buffer, length);
+	}
+
+	if (self->_stop)
+	{
+		return 1;
+	}
+
+	return 0;
+}
+
+void Ft245::rx_callback(const quint8 *data, quint64 size)
+{
+	emit rx(data, size);
 }
 
 void Ft245::rx_thread_stopped()
 {
 	emit fatal();
 	emit close();
+}
+
+void Ft245::poll()
+{
+	int ret = ftdi_duplex_poll(duplex);
+	if (ret)
+	{
+		qDebug() << "ftdi_duplex_poll failed : " << ret;
+	}
 }
 
 int Ft245::open(void)
@@ -103,15 +128,12 @@ int Ft245::open(void)
 		return -1;
 	}
 
-	ft245_rx = new Ft245RxThread;
-	ft245_rx->moveToThread(&rx_thread);
-	connect(&rx_thread, &QThread::finished, ft245_rx, &QObject::deleteLater);
-	connect(this, &Ft245::rx_thread_start, ft245_rx, &Ft245RxThread::doWork);
-	connect(this, &Ft245::rx_thread_stop, ft245_rx, &Ft245RxThread::stop);
-	connect(ft245_rx, &Ft245RxThread::rx, this, &Ft245::rx);
-	connect(ft245_rx, &Ft245RxThread::stopped, this, &Ft245::rx_thread_stopped);
-	rx_thread.start();
-	emit rx_thread_start(ftdi);
+	_stop = false;
+	duplex = ftdi_duplex_start(ftdi, read_callback, this, 8, 8);
+
+	timer = new QTimer(this);
+	connect(timer, SIGNAL(timeout()), this, SLOT(poll()));
+	timer->start(0);
 
 	return 0;
 }
@@ -124,9 +146,6 @@ void Ft245::close(void)
 	}
 
 	emit rx_thread_stop();
-
-	rx_thread.quit();
-	rx_thread.wait();
 
 	if (ftdi_set_bitmode(ftdi,  0xff, BITMODE_RESET) < 0)
 	{
@@ -155,9 +174,14 @@ void Ft245::fatal(const char *msg, const char *file, int n)
 	emit fatal();
 }
 
-void Ft245::tx(const QByteArray &data)
+void Ft245::tx(const quint8 *data, quint64 size)
 {
-	ft245_rx->tx(data);
+	int ret = ftdi_duplex_write(duplex, (const char *)data, size);
+	if (ret < 0)
+	{
+		qDebug() << "ftdi_duplex_write failed with status" << ret;
+		return;
+	}
 }
 
 Ft245::~Ft245()

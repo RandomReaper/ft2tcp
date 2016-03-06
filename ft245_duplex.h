@@ -24,8 +24,8 @@ struct ftdi_duplex_context
 
 struct ftdi_duplex_context *
 ftdi_duplex_start(struct ftdi_context *ftdi,
-                FTDIDuplexCallback *callback, void *userdata,
-                int packetsPerTransfer, int numTransfers);
+					FTDIDuplexCallback *callback, void *userdata,
+					int packetsPerTransfer, int numTransfers);
 
 int ftdi_duplex_poll(struct ftdi_duplex_context *duplex);
 int ftdi_duplex_stop(struct ftdi_duplex_context *duplex);

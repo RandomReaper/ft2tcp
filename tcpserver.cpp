@@ -33,21 +33,21 @@ void TcpServer::quit()
 	server->close();
 }
 
-void TcpServer::tx(const QByteArray &data)
+void TcpServer::tx(const quint8 *data, quint64 size)
 {
 	// qDebug() << "tx:data.length:" << data.length();
-	if (data.length() != 510)
+	if (size != 510)
 	{
 		//qDebug() << "tx:data.length:" << data.length();
 	}
-	if (data.length() == 0)
+	if (size == 0)
 	{
-		qDebug() << "tx:data.length:" << data.length();
+		qDebug() << "tx:size:" << size;
 	}
 
 	foreach(QTcpSocket *s, clients)
 	{
-		s->write(data);
+		s->write((const char *)data, size);
 	}
 }
 
@@ -60,7 +60,17 @@ void TcpServer::disconnected()
 void TcpServer::rxReady()
 {
 	QTcpSocket* client = static_cast<QTcpSocket*>(QObject::sender());
-	emit rx(client->readAll());
+	quint8 buffer[512];
+	for (;;)
+	{
+		quint64 size = client->read((char *)buffer, sizeof(buffer));
+		if (size == 0)
+		{
+			break;
+		}
+		else
+		emit rx(buffer, size);
+	}
 }
 
 void TcpServer::newConnection()
