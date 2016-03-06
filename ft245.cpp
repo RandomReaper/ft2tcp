@@ -129,7 +129,7 @@ int Ft245::open(void)
 	}
 
 	_stop = false;
-	duplex = ftdi_duplex_start(ftdi, read_callback, this, 8, 8);
+	duplex = ftdi_duplex_start(ftdi, read_callback, this, 128, 8);
 
 	timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(poll()));
