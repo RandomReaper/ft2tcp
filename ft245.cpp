@@ -26,7 +26,7 @@ void Ft245::rx_callback(const quint8 *data, quint64 size)
 void Ft245::poll()
 {
 	int ret = ftdi_duplex_poll(duplex);
-	if (ret)
+	if (ret < 0)
 	{
 		fatal("ftdi_duplex_poll", __FILE__, __LINE__ );
 	}
@@ -34,7 +34,6 @@ void Ft245::poll()
 
 int Ft245::open(void)
 {
-	int type;
 	struct ftdi_version_info info = ftdi_get_library_version();
 	QList<uint16_t> supported_pid = QList<uint16_t>() << 0x6010 << 0x6014;
 
@@ -80,47 +79,7 @@ int Ft245::open(void)
 		return -1;
 	}
 
-	if (ftdi_read_eeprom(ftdi) < 0)
-	{
-		fatal("ftdi_read_eeprom", __FILE__, __LINE__ );
-		close();
-		return -1;
-	}
 
-	if (ftdi_eeprom_decode(ftdi, 0) < 0)
-	{
-		fatal("ftdi_eeprom_decode", __FILE__, __LINE__ );
-		close();
-		return -1;
-	}
-
-	if (ftdi_get_eeprom_value(ftdi, CHANNEL_A_TYPE, &type) < 0)
-	{
-		fatal("ftdi_get_eeprom_value", __FILE__, __LINE__ );
-		close();
-		return -1;
-	}
-
-	if (type != CHANNEL_IS_FIFO)
-	{
-		fatal("type != CHANNEL_IS_FIFO, go fix your eeprom for 245FIFO mode", __FILE__, __LINE__ );
-		close();
-		return -1;
-	}
-
-	if(ftdi_usb_purge_rx_buffer(ftdi) < 0)
-	{
-		fatal("ftdi_usb_purge_rx_buffer", __FILE__, __LINE__ );
-		close();
-		return -1;
-	}
-
-	if (ftdi_set_latency_timer(ftdi, 2) < 0)
-	{
-		fatal("ftdi_set_latency_timer", __FILE__, __LINE__ );
-		close();
-		return -1;
-	}
 
 	_stop = false;
 	duplex = ftdi_duplex_start(ftdi, read_callback, this, 128, 8);

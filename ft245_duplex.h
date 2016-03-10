@@ -8,24 +8,23 @@
 extern "C" {
 #endif
 
-typedef int (FTDIDuplexCallback)(uint8_t *buffer, int length, void *userdata);
+typedef int (ftdi_duplex_rx_cb)(uint8_t *buffer, int length, void *userdata);
 
 struct ftdi_duplex_context
 {
 	struct ftdi_context *ftdi;
-	FTDIDuplexCallback *callback;
-	void *userdata;
-	int packetsize;
-	int activity;
-	int result;
-	struct libusb_transfer **transfers;
-	int numTransfers;
+	ftdi_duplex_rx_cb *rx_cb;
+	void *cb_data;
+	int pkt_size;
+	int status;
+	int nr_rx;
+	int stop;
+	struct libusb_transfer **rx_xfers;
 };
 
-struct ftdi_duplex_context *
-ftdi_duplex_start(struct ftdi_context *ftdi,
-					FTDIDuplexCallback *callback, void *userdata,
-					int packetsPerTransfer, int numTransfers);
+struct ftdi_duplex_context *ftdi_duplex_start(struct ftdi_context *ftdi,
+				ftdi_duplex_rx_cb *rx_cb, void *cb_data,
+				int pkt_per_xfer, int nr_rx);
 
 int ftdi_duplex_poll(struct ftdi_duplex_context *duplex);
 int ftdi_duplex_stop(struct ftdi_duplex_context *duplex);
