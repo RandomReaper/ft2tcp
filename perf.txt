@@ -1,0 +1,34 @@
+Performance 
+	* sw 2cea77d14d4ff4625192436560e4611772c9f5a0
+	* hw 13c605cf675eb0a54b221f7a3c8bf6c4cf9166f5
+
+core i7-4790-ubuntu-15.10: (% cpu oscillating, perhaps related to frequency scaling)
+* ft2tcp alone: 12 % cpu
+* ft2tcp + nc localhost 9999 | dd of=/dev/null bs=1M
+	* bw		: 48.6 MB/s 
+	* ft2tcp	: 11 %
+	* nc		: 7 %
+	* dd		: 4 %
+* ft2stdio | dd of=/dev/null bs=1M
+	* bw		: 48.6 MB/s
+	* ft2stdio	: 12 % cpu
+	* dd		: 7 % cpu
+
+core 2 quad q550-windows7-64: (I event don't want to know how to measure cpu :/ )
+* ft2tcp + nc localhost 9999 | dd of=/dev/null bs=1M
+	* bw		: 38.9 MB/s 
+
+raspberry pi2b-debian-jessie:
+* ft2tcp alone: 32 % cpu
+* ft2tcp + nc localhost 9999 | dd of=/dev/null bs=1M
+	* bw		: 36.6 MB/s 
+	* ft2tcp	: 76 %
+	* nc		: 33 %
+	* dd		: 16 %
+* ft2stdio | dd of=/dev/null bs=1M
+	* bw		: 32.3 MB/s
+	* ft2stdio	: 93 % cpu
+	* dd		: 33 % cpu
+
+
+
