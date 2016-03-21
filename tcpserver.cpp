@@ -16,7 +16,7 @@ int TcpServer::start()
 
 	if(!server->listen(QHostAddress::Any, 9999))
 	{
-		qDebug() << "Server could not start";
+		qDebug() << "Server could not start, listen failed";
 		return -1;
 	}
 	else
