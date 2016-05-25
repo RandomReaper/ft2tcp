@@ -1,5 +1,5 @@
 Performance
-	* sw 2cea77d14d4ff4625192436560e4611772c9f5a0
+	* sw 0c53802f6b3672fef7e8e4a658342ed82ab5932f
 	* hw 13c605cf675eb0a54b221f7a3c8bf6c4cf9166f5
 
 core i7-4790-ubuntu-15.10: (% cpu oscillating, perhaps related to frequency scaling)

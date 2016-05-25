@@ -3,6 +3,9 @@ TCP interface to FTDI FT245 synchronous FIFO
 
 Qt/C++ code for [ft245_sync_if.vhd](https://github.com/RandomReaper/pim-vhdl/blob/master/hdl/rtl/ft245_sync_if/ft245_sync_if.vhd).
 
+## Eeprom
+The FTDI EEPROM must be configured in fifo mode, see [eeprom configuration](./eeprom-config/README.md).
+
 ## Performance
 Performance is really close to USB full speed maximum, more than 40 MiB/s (see [perf.txt](./perf.txt))
 
@@ -24,7 +27,7 @@ This procedure will compile ```./build/win{32,64}/release/ft2tcp.exe``` **static
 
 
 Tested on unbuntu 16.04 LTS:
-1. Install mxe.cc
+1. Install mxe.cc (can take hours)
 ```
 sudo apt-get install git build-essential libftdi1-dev qt5-default automake autopoint bison flex gperf libtool libtool-bin ruby scons intltool p7zip-full libgdk-pixbuf2.0-dev
 mkdir -p ~/git && cd ~/git
