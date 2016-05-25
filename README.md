@@ -27,7 +27,8 @@ This procedure will compile ```./build/win{32,64}/release/ft2tcp.exe``` **static
 
 
 Tested on unbuntu 16.04 LTS:
-1. Install mxe.cc (can take hours)
+
+* Install mxe.cc (can take hours)
 ```
 sudo apt-get install git build-essential libftdi1-dev qt5-default automake autopoint bison flex gperf libtool libtool-bin ruby scons intltool p7zip-full libgdk-pixbuf2.0-dev
 mkdir -p ~/git && cd ~/git
@@ -36,7 +37,7 @@ cd mxe
 echo MXE_TARGETS='x86_64-w64-mingw32.static i686-w64-mingw32.static' >> settings.mk
 make qt5 libftdi1
 ```
-2. Compile
+* Compile
 ```bash
 cd ~/git/ft2tcp
 ./cross-compile-win.sh
