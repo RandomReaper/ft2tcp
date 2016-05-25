@@ -1,4 +1,4 @@
-# ft2tcp
+# ft2tcp [![Build Status](https://travis-ci.org/RandomReaper/ft2tcp.svg?branch=master)](https://travis-ci.org/RandomReaper/ft2tcp)
 TCP interface to FTDI FT245 synchronous FIFO
 
 Qt/C++ code for [ft245_sync_if.vhd](https://github.com/RandomReaper/pim-vhdl/blob/master/hdl/rtl/ft245_sync_if/ft245_sync_if.vhd).
