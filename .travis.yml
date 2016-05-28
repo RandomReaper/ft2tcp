@@ -13,7 +13,7 @@ notifications:
 
 addons:
   apt:
-    sources
+    sources:
     - debian-sid
     packages:
     - libftdi1-dev
