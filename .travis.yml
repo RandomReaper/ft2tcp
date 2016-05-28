@@ -1,0 +1,23 @@
+#
+# Get ghdl and run all the test benches
+#
+language: C
+
+sudo: false
+dist: trusty
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+
+addons:
+  apt:
+    packages:
+#    - libftdi1-dev
+    - qtbase5-dev-tools
+    - qt5-qmake
+
+script:
+  - .travis/build.sh
+
