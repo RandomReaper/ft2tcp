@@ -14,7 +14,7 @@ notifications:
 addons:
   apt:
     sources:
-    - debian-sid
+    - ubuntu-sdk-team
     packages:
     - libftdi1-dev
     - libqt4-dev
