@@ -16,9 +16,9 @@ addons:
     sources:
     - ubuntu-sdk-team
     packages:
+    - qt5-default
+    - qttools5-dev-tools
     - libftdi1-dev
-    - libqt4-dev
-    - qt4-qmake
 
 script:
   - .travis/build.sh
