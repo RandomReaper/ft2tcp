@@ -4,7 +4,7 @@
 language: C
 
 sudo: false
-#dist: trusty
+dist: trusty
 
 notifications:
   email:
@@ -13,6 +13,8 @@ notifications:
 
 addons:
   apt:
+    sources
+    - debian-sid
     packages:
     - libftdi1-dev
     - libqt4-dev
