@@ -14,9 +14,9 @@ notifications:
 addons:
   apt:
     packages:
-#    - libftdi1-dev
-    - qtbase5-dev-tools
-    - qt5-qmake
+    - libftdi1-dev
+    - libqt4-dev
+    - qt4-qmake
 
 script:
   - .travis/build.sh
