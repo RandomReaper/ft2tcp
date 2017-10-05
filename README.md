@@ -48,3 +48,6 @@ cd ~/git/ft2tcp
 Since I haven't found any way to create an installable Qt executable (either statically or
 dynamically linked) see [Cross compiling for windows](#Cross-compiling-for-windows).
 
+## Windows drivers
+By default windows will install the FTDI drivers, but the WinUSB drivers are necessary for libusb,
+the driver used can be changed using [zadig](http://zadig.akeo.ie/). 
